@@ -1,0 +1,30 @@
+[project]
+name = "crm-experiment-lab"
+version = "0.1.0"
+description = "CRM campaign experimentation lab — why porting product A/B logic to CRM breaks, and what fixes it (segment-stage randomization, global control group, send balancer, net-of-unsubscribe effect)."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "pandas",
+    "scipy",
+    "statsmodels",
+    "matplotlib>=3.11.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501", "UP009"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
