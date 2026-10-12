@@ -1,5 +1,35 @@
 # CRM Experiment Lab
 
+> A global control group measures **+0.9968** cumulative purchases per user; net of churn the campaign is **+50.5** per 1,000 treated (uplift +212.8 − unsub +162.3).
+
+## Navigation
+- 🌐 [Portfolio site](https://nikitaboyarkin.github.io)
+- 🏦 [Flagship case: Volta neobank](https://github.com/NikitaBoyarkin/volta-banking)
+- 🧪 Related: [ab_test](https://github.com/NikitaBoyarkin/ab_test) · [causal-uplift](https://github.com/NikitaBoyarkin/causal-uplift) · [browser-mini-games](https://github.com/NikitaBoyarkin/browser-mini-games)
+
+**On this page:** [Situation](#situation) · [Task](#task) · [Actions](#actions) · [Result](#result) · [Headline results](#headline-results) · [Quickstart](#quickstart) · [Modules](#modules) · [Testing philosophy](#testing-philosophy) · [Limitations & scope](#limitations--scope) · [Layout](#layout)
+
+## Situation
+CRM communication experiments break the assumptions of generic product A/B tooling. The same user is targeted by many campaigns, so randomization has to happen once, at segment-formation time; the worth of a campaign is not its purchases but the net of incremental purchasers minus unsubscribes; and a per-user daily notification cap has to be enforced. None of that is covered by a standard product-testing stack.
+
+## Task
+Build a synthetic CRM-communication experimentation platform that reproduces this CRM-specific layer on a known data-generating process, so every claim is reproducible from one seed.
+
+## Actions
+- Simulate a known-DGP CRM experiment with fixed per-user groups, a global control group, and capped sends.
+- Randomize at segment-formation time and show that exposure-stage bucketing fires SRM.
+- Estimate cumulative campaign uplift with the GCG, and compare a full vs partial control refresh.
+- Enforce a per-user daily send cap in the balancer and spread sends over prime hours.
+- Compute the net effect as incremental purchasers − incremental unsubscribes per 1,000 treated, plus the exposure window and guardrails.
+- Calibrate the shared statistics against `statsmodels`/`scipy` rather than trusting the closed forms.
+
+## Result
+- **+0.9968** — GCG cumulative uplift per user by day 27 [+0.9433, +1.0502], CI excludes 0.
+- **+50.5** — net effect per 1,000 treated (uplift +212.8 − unsub +162.3; ratio 1.31).
+- **0.0090 vs 0.3280** — partial-refresh CV vs full-refresh: a partial rotation keeps the control baseline stable.
+- **p = 0.266** — segment-share SRM is balanced; first-activity bucketing breaks it (exposure share 0.5629, p ≈ 0).
+- **0 violations** — the daily send cap holds (notifications 3.0 ≤ cap) while the unsubscribe guardrail fires (+0.1623).
+
 A synthetic CRM-communication experimentation platform that reproduces the
 **CRM-specific** layer of A/B testing which generic product tooling misses:
 randomization has to happen **once, at segment-formation time** (because the same
