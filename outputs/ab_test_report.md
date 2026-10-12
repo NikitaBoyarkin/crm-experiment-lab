@@ -76,8 +76,8 @@ Assignment is fixed per **user**, but the exposure metric measures at the **user
 
 | Method | SE of the difference |
 |---|---|
-| Row-level two-proportion (naive, user-day) | 0.000658 |
-| Cluster-robust (Liang-Zeger, clustered by user) | 0.000659 |
+| Row-level two-proportion (naive, user-day) | 0.001947 |
+| Cluster-robust (Liang-Zeger, clustered by user) | 0.001942 |
 
 > Cluster-robust / naive = 1.00x. The check is a guard, not a finding here; the primary readout above is the user-level metric, which respects the randomisation unit by construction.
 
@@ -100,6 +100,20 @@ Assignment is fixed per **user**, but the exposure metric measures at the **user
 |---|---|---|---|---|
 | buyer | 67.5688% | 89.8223% | +32.93% | Yes |
 | seller | 67.7355% | 88.0827% | +30.04% | Yes |
+
+---
+
+### Ship scenario — can the guardrail ever pass?
+
+The CRM lever is send volume: a lower daily cap means fewer notifications, so fewer unsubscribes but also a smaller lift. `unsub delta` is therefore the **churn budget a cap requires** before it may ship. Sweeping the cap and re-reading the guardrail under two definitions — **strict** (rate must not rise at all) and **budget** (may rise up to 12% absolute) — answers whether a *ship* verdict is reachable at all:
+
+| daily cap | relative lift | unsub delta (= budget needed) | unsub p | net / 1k | verdict (strict) | verdict (12% budget) |
+|---|---|---|---|---|---|---|
+| 3 | +31.5% | +0.1623 | <1e-300 | +50.5 | Investigate | Investigate |
+| 2 | +25.5% | +0.1155 | <1e-300 | +56.8 | Investigate | Ship |
+| 1 | +15.5% | +0.0620 | <1e-300 | +42.7 | Investigate | Ship |
+
+> Because the treated arm is **sent to** and the control arm is not, the unsubscribe delta is positive and significant at every cap — the strict guardrail (`delta > 0` blocks) can never be satisfied, at any volume, so a ship verdict is reachable **only** with an explicit churn budget. Under a 12% budget: caps 1 and 2 ship, cap 3 (needs 16.3%) does not — and **cap 2 maximises the net effect (+56.8 / 1k)**, cutting churn from 16.2% to 11.6% at a smaller lift cost than cap 1. The actionable read: set the churn budget from the ARPU value of a lost user, then **ship at the cap that maximises net within it** — not chase a strict zero that no sending campaign can meet.
 
 ---
 
