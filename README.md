@@ -55,6 +55,12 @@ synthetic experiment (20,000 users, 28 days, 12 campaigns, seed 42) and writes
 | Exposure window | effect any = 0.03621 (SE 0.00066) vs windowed = 0.03598 (SE 0.00124); transient DGP sensitivity 7.6 → 12.3 | the window anchors both arms to one horizon; it is *not* a free SE cut |
 | Guardrails | unsubscribe +0.1623 (breach), notifications 3.0 ≤ cap | the unsubscribe guardrail fires; the daily cap holds (0 violations) |
 
+**Source of these numbers.** They come from the full simulator run
+(`scripts/run_full_pipeline.py`: 20,000 users, 28 days, 12 campaigns, seed 42),
+**not** from the committed `data/experiment_sample.csv`. That CSV is an
+*outcomes-schema* example (300 rows) with no `group` column, so the uplift and net
+figures cannot be reproduced from it — run the pipeline instead.
+
 The point of the demo is that each step can **fail loudly**: an SRM check that
 fires under the wrong bucketing, a GCG refresh that makes the control baseline
 jump, a campaign whose unsubscribes outweigh its purchases.
