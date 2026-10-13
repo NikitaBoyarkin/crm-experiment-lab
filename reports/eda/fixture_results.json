@@ -1,0 +1,155 @@
+{
+  "shape": [
+    300,
+    6
+  ],
+  "columns": [
+    "user_id",
+    "day",
+    "purchased",
+    "purchase_amount",
+    "unsubscribed",
+    "sessions"
+  ],
+  "dtypes": {
+    "user_id": "int64",
+    "day": "int64",
+    "purchased": "bool",
+    "purchase_amount": "float64",
+    "unsubscribed": "bool",
+    "sessions": "int64"
+  },
+  "n_users": 15,
+  "n_days": 20,
+  "day_range": [
+    0,
+    19
+  ],
+  "expected_grid": 300,
+  "grid_complete": true,
+  "null_share": {
+    "user_id": 0.0,
+    "day": 0.0,
+    "purchased": 0.0,
+    "purchase_amount": 0.0,
+    "unsubscribed": 0.0,
+    "sessions": 0.0
+  },
+  "full_dup_rows": 0,
+  "dup_key_user_day": 0,
+  "constant_cols": [
+    "unsubscribed"
+  ],
+  "purchased_true": 16,
+  "purchased_rate": 0.05333333333333334,
+  "unsubscribed_true": 0,
+  "purchase_amount_min": 0.0,
+  "purchase_amount_nonzero": 16,
+  "sessions_min": 0,
+  "sessions_max": 6,
+  "numeric_stats": {
+    "user_id": {
+      "mean": 7.0,
+      "median": 7.0,
+      "std": 4.327712674146304,
+      "p95": 14.0,
+      "skew": 0.0,
+      "iqr_outlier_share": 0.0
+    },
+    "day": {
+      "mean": 9.5,
+      "median": 9.5,
+      "std": 5.775915859270972,
+      "p95": 18.05000000000001,
+      "skew": 0.0,
+      "iqr_outlier_share": 0.0
+    },
+    "purchase_amount": {
+      "mean": 26.828025091791858,
+      "median": 0.0,
+      "std": 154.29611466400385,
+      "p95": 88.35964845109368,
+      "skew": 7.79216106852121,
+      "iqr_outlier_share": 0.05333333333333334
+    },
+    "sessions": {
+      "mean": 1.9933333333333334,
+      "median": 2.0,
+      "std": 1.3927507810141797,
+      "p95": 4.050000000000011,
+      "skew": 0.5802650003004896,
+      "iqr_outlier_share": 0.0
+    }
+  },
+  "corr_pairs_ge_0_5": [],
+  "paid_amount_stats": {
+    "n": 16,
+    "min": 88.24845674482195,
+    "median": 324.83973874707976,
+    "mean": 503.0254704710974,
+    "max": 1693.394318609277
+  },
+  "segment_by_day": {
+    "overall_rate": 0.05333333333333334,
+    "min_rate": 0.0,
+    "max_rate": 0.13333333333333333,
+    "days_with_purchase": 14,
+    "users_per_day_constant": true
+  },
+  "users_per_day_min": 15,
+  "users_per_day_max": 15,
+  "purchase_rate_by_sessions": {
+    "0": {
+      "n": 41,
+      "rate": 0.0488
+    },
+    "1": {
+      "n": 78,
+      "rate": 0.0385
+    },
+    "2": {
+      "n": 90,
+      "rate": 0.0667
+    },
+    "3": {
+      "n": 43,
+      "rate": 0.093
+    },
+    "4+": {
+      "n": 48,
+      "rate": 0.0208
+    }
+  },
+  "corr_sessions_purchased": -0.009531165274917196,
+  "weekly": {
+    "0": {
+      "rows": 105,
+      "purchases": 5,
+      "rate": 0.0476,
+      "sessions_per_user_day": 2.143
+    },
+    "1": {
+      "rows": 105,
+      "purchases": 5,
+      "rate": 0.0476,
+      "sessions_per_user_day": 2.048
+    },
+    "2": {
+      "rows": 90,
+      "purchases": 6,
+      "rate": 0.0667,
+      "sessions_per_user_day": 1.756
+    }
+  },
+  "weekly_rate_delta": {
+    "0": null,
+    "1": 0.0,
+    "2": 0.4
+  },
+  "week_day_counts": {
+    "0": 7,
+    "1": 7,
+    "2": 6
+  },
+  "fixture_regenerable_note": "Searched simulator seeds 0..1999 for n_users=15, n_days=20; no full match on (purchased, sessions). Fixture is a schema example, not a committed simulator artifact."
+}

@@ -1,0 +1,129 @@
+{
+  "config": {
+    "n_users": 20000,
+    "n_days": 28,
+    "n_campaigns": 12,
+    "seed": 42,
+    "daily_cap": 3.0
+  },
+  "pvalues": {
+    "segment_srm": 0.2656,
+    "exposure_srm": 0.0
+  },
+  "guardrails": {
+    "n_breached": 1,
+    "n_total": 2,
+    "notifications_per_user_per_day": 3.0,
+    "daily_cap": 3.0,
+    "cap_holds": true,
+    "unsubscribe_delta": 0.162257
+  },
+  "checks": [
+    {
+      "claim": "GCG cumulative uplift/user by day 27",
+      "readme_value": 0.9968,
+      "recomputed": 0.996751,
+      "status": "REPRODUCED",
+      "delta": -4.9e-05
+    },
+    {
+      "claim": "GCG uplift CI low",
+      "readme_value": 0.9433,
+      "recomputed": 0.943322,
+      "status": "REPRODUCED",
+      "delta": 2.2e-05
+    },
+    {
+      "claim": "GCG uplift CI high",
+      "readme_value": 1.0502,
+      "recomputed": 1.050181,
+      "status": "REPRODUCED",
+      "delta": -1.9e-05
+    },
+    {
+      "claim": "Net effect / 1k treated",
+      "readme_value": 50.5,
+      "recomputed": 50.53475,
+      "status": "REPRODUCED",
+      "delta": 0.03475
+    },
+    {
+      "claim": "Incremental purchasers / 1k",
+      "readme_value": 212.8,
+      "recomputed": 212.791564,
+      "status": "REPRODUCED",
+      "delta": -0.008436
+    },
+    {
+      "claim": "Incremental unsubscribes / 1k",
+      "readme_value": 162.3,
+      "recomputed": 162.256814,
+      "status": "REPRODUCED",
+      "delta": -0.043186
+    },
+    {
+      "claim": "CV full refresh",
+      "readme_value": 0.328,
+      "recomputed": 0.327984,
+      "status": "REPRODUCED",
+      "delta": -1.6e-05
+    },
+    {
+      "claim": "CV partial refresh",
+      "readme_value": 0.009,
+      "recomputed": 0.009046,
+      "status": "REPRODUCED",
+      "delta": 4.6e-05
+    },
+    {
+      "claim": "Segment-stage test share",
+      "readme_value": 0.4958,
+      "recomputed": 0.495841,
+      "status": "REPRODUCED",
+      "delta": 4.1e-05
+    },
+    {
+      "claim": "Exposure-stage test share",
+      "readme_value": 0.5629,
+      "recomputed": 0.562872,
+      "status": "REPRODUCED",
+      "delta": -2.8e-05
+    },
+    {
+      "claim": "Exposure window: all-days effect",
+      "readme_value": 0.03621,
+      "recomputed": 0.036207,
+      "status": "REPRODUCED",
+      "delta": -3e-06
+    },
+    {
+      "claim": "Exposure window: windowed effect",
+      "readme_value": 0.03598,
+      "recomputed": 0.035978,
+      "status": "REPRODUCED",
+      "delta": -2e-06
+    },
+    {
+      "claim": "Window sensitivity all-days (effect/SE)",
+      "readme_value": 7.6,
+      "recomputed": 7.552747,
+      "status": "REPRODUCED",
+      "delta": -0.047253
+    },
+    {
+      "claim": "Window sensitivity windowed (effect/SE)",
+      "readme_value": 12.3,
+      "recomputed": 12.279346,
+      "status": "REPRODUCED",
+      "delta": -0.020654
+    },
+    {
+      "claim": "Unsubscribe guardrail delta",
+      "readme_value": 0.1623,
+      "recomputed": 0.162257,
+      "status": "REPRODUCED",
+      "delta": -4.3e-05
+    }
+  ],
+  "all_reproduced": true
+}
