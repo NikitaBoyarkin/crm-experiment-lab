@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRM Experiment Lab — Experiment Readout</title>
+<meta name="description" content="Stakeholder readout for the CRM Experiment Lab: SRM, global control group uplift, variance reduction, net effect and guardrails.">
+<style>
+  :root {
+    color-scheme: light;
+    --plane: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --border: rgba(11, 11, 11, 0.10);
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --blue: #2a78d6;
+    --blue-100: #cde2fb;
+    --blue-700: #0d366b;
+    --red: #e34948;
+    --critical: #d03b3b;
+    --warning: #fab219;
+    --good: #0ca30c;
+    --good-ink: #006300;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(11, 11, 11, 0.04), 0 8px 24px rgba(11, 11, 11, 0.04);
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--plane);
+    color: var(--ink);
+    font: 16px/1.55 var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 34px 16px 48px;
+  }
+
+  /* ---------- Header ---------- */
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 24px;
+    align-items: start;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .eyebrow {
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  h1 {
+    margin: 4px 0 10px;
+    font-size: clamp(2rem, 5vw, 2.85rem);
+    font-weight: 680;
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+  }
+
+  .claim {
+    margin: 0;
+    max-width: 64ch;
+    font-size: clamp(1rem, 2.1vw, 1.16rem);
+    color: var(--ink-2);
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+    border: 1px solid rgba(12, 163, 12, 0.28);
+    border-radius: 999px;
+    background: rgba(12, 163, 12, 0.08);
+    color: var(--good-ink);
+    font-size: 0.82rem;
+    font-weight: 650;
+    white-space: nowrap;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--good);
+    flex: none;
+  }
+
+  .meta {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    font-size: 0.8rem;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  .chip b {
+    color: var(--ink);
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- Sections & cards ---------- */
+
+  main { display: block; }
+
+  section { margin-top: 36px; }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    margin-bottom: 14px;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.32rem;
+    font-weight: 680;
+    letter-spacing: -0.015em;
+  }
+
+  .section-kicker {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .section-lede {
+    flex-basis: 100%;
+    margin: 2px 0 0;
+    max-width: 72ch;
+    color: var(--ink-2);
+    font-size: 0.95rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: clamp(18px, 3vw, 28px);
+    box-shadow: var(--shadow);
+  }
+
+  .card + .card { margin-top: 16px; }
+
+  .divider {
+    height: 1px;
+    margin: 24px 0;
+    background: var(--grid);
+    border: 0;
+  }
+
+  /* ---------- Verdict ---------- */
+
+  .verdict {
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+    gap: 26px 32px;
+    margin-top: 24px;
+    padding: clamp(20px, 4vw, 32px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    break-inside: avoid;
+  }
+
+  .verdict-label {
+    font-size: 0.74rem;
+    font-weight: 650;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .hero-figure {
+    margin: 6px 0 2px;
+    font-size: clamp(3rem, 9.5vw, 4.4rem);
+    font-weight: 680;
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+
+  .hero-unit {
+    margin: 0 0 12px;
+    font-size: 1rem;
+    color: var(--ink-2);
+  }
+
+  .decomposition {
+    margin: 0 0 14px;
+    padding: 10px 12px;
+    border-left: 3px solid var(--blue);
+    background: rgba(42, 120, 214, 0.05);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.94rem;
+    line-height: 1.5;
+  }
+
+  .decomposition .pos,
+  .decomposition .neg {
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .decomposition .pos { color: var(--ink); }
+  .decomposition .neg { color: var(--ink); }
+
+  .confidence {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--ink-2);
+  }
+
+  .confidence b { color: var(--ink); }
+
+  .decision {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 7px 12px;
+    border: 1px solid rgba(236, 131, 90, 0.5);
+    border-radius: 999px;
+    background: rgba(236, 131, 90, 0.14);
+    color: #6d3218;
+    font-size: 0.84rem;
+    font-weight: 650;
+  }
+
+  .decision svg { flex: none; }
+
+  .guardrail-panel {
+    padding: 16px 18px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  .guardrail-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .guardrail-head h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 680;
+  }
+
+  .guardrail-count {
+    font-size: 0.78rem;
+    font-weight: 650;
+    color: var(--critical);
+    white-space: nowrap;
+  }
+
+  .g-row {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    gap: 4px 10px;
+    padding: 10px 0;
+    border-top: 1px solid var(--grid);
+  }
+
+  .g-row:first-of-type { border-top: 0; padding-top: 0; }
+
+  .g-icon { align-self: start; margin-top: 2px; }
+  .g-icon.fail { color: var(--critical); }
+  .g-icon.pass { color: var(--good); }
+
+  .g-name {
+    font-size: 0.9rem;
+    font-weight: 650;
+  }
+
+  .g-detail {
+    grid-column: 2;
+    font-size: 0.83rem;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .g-state { font-weight: 650; }
+  .g-state.fail { color: var(--critical); }
+  .g-state.pass { color: var(--good-ink); }
+
+  /* ---------- Generic grids & tiles ---------- */
+
+  .grid { display: grid; gap: 14px; }
+  .g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .tile {
+    padding: 16px 18px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fff;
+    break-inside: avoid;
+  }
+
+  .tile.accent-blue { border-top: 3px solid var(--blue); }
+  .tile.accent-red { border-top: 3px solid var(--red); }
+  .tile.accent-ink { border-top: 3px solid var(--ink); }
+  .tile.accent-good { border-top: 3px solid var(--good); }
+  .tile.accent-warn { border-top: 3px solid var(--warning); }
+
+  .t-label {
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .t-value {
+    margin-top: 6px;
+    font-size: clamp(1.45rem, 3vw, 1.85rem);
+    font-weight: 680;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .t-note {
+    margin-top: 5px;
+    font-size: 0.82rem;
+    color: var(--ink-2);
+  }
+
+  .mini-value {
+    font-size: 1.55rem;
+    font-weight: 680;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-top: 5px;
+  }
+
+  .mini-note {
+    margin-top: 6px;
+    font-size: 0.84rem;
+    color: var(--ink-2);
+  }
+
+  /* ---------- Split layouts ---------- */
+
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 24px;
+    align-items: center;
+    margin-top: 18px;
+  }
+
+  .split.wide-right {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  }
+
+  .split > * { min-width: 0; }
+
+  /* ---------- Tables ---------- */
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  .table-note {
+    margin: 10px 0 0;
+    font-size: 0.8rem;
+    color: var(--ink-2);
+    line-height: 1.45;
+  }
+
+  th {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--axis);
+    text-align: left;
+    font-size: 0.69rem;
+    font-weight: 650;
+    letter-spacing: 0.065em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 11px 10px;
+    border-bottom: 1px solid var(--grid);
+    vertical-align: top;
+  }
+
+  tbody tr:last-child td { border-bottom: 0; }
+
+  td.num,
+  th.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  td.metric { font-weight: 600; }
+
+  .flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 650;
+    white-space: nowrap;
+  }
+
+  .flag.fail { color: var(--critical); }
+  .flag.pass { color: var(--good-ink); }
+
+  .sub {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.76rem;
+    font-weight: 400;
+    color: var(--ink-2);
+    white-space: normal;
+  }
+
+  /* ---------- Figures ---------- */
+
+  figure { margin: 0; }
+
+  figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  figcaption {
+    margin-top: 8px;
+    font-size: 0.81rem;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  /* ---------- Hierarchy ---------- */
+
+  .hierarchy {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .tier {
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fff;
+  }
+
+  .tier-name {
+    font-size: 0.68rem;
+    font-weight: 650;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .tier-metrics {
+    margin-top: 6px;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    line-height: 1.55;
+    color: var(--ink);
+    overflow-wrap: normal;
+  }
+
+  .tier.guardrail-tier { border-color: rgba(208, 59, 59, 0.35); }
+
+  /* ---------- Callout ---------- */
+
+  .callout {
+    display: grid;
+    grid-template-columns: 26px minmax(0, 1fr);
+    gap: 4px 14px;
+    padding: 18px 20px;
+    border: 1px solid rgba(208, 59, 59, 0.34);
+    border-radius: 12px;
+    background: rgba(208, 59, 59, 0.05);
+    break-inside: avoid;
+  }
+
+  .callout-icon {
+    color: var(--critical);
+    margin-top: 1px;
+  }
+
+  .callout h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 680;
+    line-height: 1.35;
+  }
+
+  .callout p {
+    grid-column: 2;
+    margin: 6px 0 0;
+    font-size: 0.9rem;
+    color: var(--ink-2);
+  }
+
+  .callout code,
+  .sources code {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    padding: 1px 5px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: rgba(11, 11, 11, 0.035);
+    overflow-wrap: anywhere;
+  }
+
+  .caveat-list {
+    margin: 16px 0 0;
+    padding-left: 20px;
+    font-size: 0.9rem;
+    color: var(--ink-2);
+  }
+
+  .caveat-list li { margin-bottom: 9px; }
+  .caveat-list li:last-child { margin-bottom: 0; }
+  .caveat-list strong { color: var(--ink); }
+
+  /* ---------- Footer ---------- */
+
+  footer {
+    margin-top: 42px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--ink-2);
+  }
+
+  .sources-title {
+    margin: 0 0 8px;
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .sources {
+    margin: 0;
+    padding-left: 18px;
+    line-height: 1.6;
+  }
+
+  .sources li { margin-bottom: 4px; }
+
+  .provenance {
+    margin: 12px 0 0;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+  }
+
+  .footer-meta {
+    margin: 12px 0 0;
+    font-size: 0.78rem;
+    color: var(--ink-2);
+  }
+
+  /* ---------- Responsive ---------- */
+
+  @media (max-width: 820px) {
+    .verdict { grid-template-columns: 1fr; }
+    .g3 { grid-template-columns: 1fr; }
+    .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .split,
+    .split.wide-right { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 620px) {
+    .hero { grid-template-columns: 1fr; }
+    .status { justify-self: start; }
+    .g2 { grid-template-columns: 1fr; }
+  }
+
+  @media screen and (max-width: 640px) {
+    .stack thead { display: none; }
+    .stack,
+    .stack tbody,
+    .stack tr,
+    .stack td { display: block; width: 100%; }
+
+    .stack tr {
+      margin-bottom: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .stack tr:last-child { margin-bottom: 0; }
+
+    .stack td {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 6px 0;
+      border: 0;
+      text-align: right;
+      white-space: normal;
+    }
+
+    .stack td + td { border-top: 1px solid var(--grid); }
+
+    .stack td::before {
+      content: attr(data-label);
+      flex: none;
+      color: var(--ink-2);
+      font-size: 0.72rem;
+      font-weight: 650;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-align: left;
+    }
+
+    .stack td.metric,
+    .stack td:first-child {
+      display: block;
+      text-align: left;
+      font-size: 1rem;
+      font-weight: 680;
+      padding-bottom: 4px;
+    }
+
+    .stack td.metric::before,
+    .stack td:first-child::before { content: none; }
+  }
+
+  /* ---------- Print ---------- */
+
+  @media print {
+    @page {
+      size: A4;
+      margin: 14mm 12mm;
+    }
+
+    html,
+    body {
+      background: #fff;
+      color: #000;
+    }
+
+    body {
+      font-size: 10pt;
+      line-height: 1.42;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page {
+      max-width: none;
+      padding: 0;
+    }
+
+    .hero { padding-bottom: 12px; }
+
+    section { margin-top: 20px; }
+
+    .card,
+    .verdict,
+    .tile,
+    .tier,
+    .callout,
+    figure,
+    .g-row {
+      break-inside: avoid;
+      box-shadow: none;
+    }
+
+    .card,
+    .verdict,
+    .tile,
+    .tier,
+    .callout {
+      background: #fff;
+    }
+
+    .verdict,
+    .g3,
+    .g4,
+    .split,
+    .split.wide-right {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    figure img {
+      max-height: 74mm;
+      width: auto;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    table {
+      width: 100%;
+      font-size: 9pt;
+    }
+
+    thead { display: table-header-group; }
+    tr { break-inside: avoid; }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .no-print { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <div>
+      <div class="eyebrow">Experiment readout · CRM Experiment Lab</div>
+      <h1>CRM Experiment Lab</h1>
+      <p class="claim">
+        A global control group measures <b>+0.9968</b> cumulative purchases per user;
+        net of churn the campaign is <b>+50.5 per 1,000 treated</b>
+        (uplift +212.8 − unsub +162.3).
+      </p>
+    </div>
+    <div class="status"><span class="status-dot" aria-hidden="true"></span>Analysis complete</div>
+    <div class="meta" aria-label="Experiment parameters">
+      <span class="chip">seed <b>42</b></span>
+      <span class="chip"><b>20,000</b> users</span>
+      <span class="chip"><b>28</b> days</span>
+      <span class="chip"><b>12</b> campaigns</span>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===================== VERDICT ===================== -->
+    <section aria-labelledby="verdict-heading">
+      <h2 id="verdict-heading" class="section-kicker" style="margin-bottom:0">Verdict</h2>
+
+      <div class="verdict">
+        <div>
+          <div class="verdict-label">Net effect per 1,000 treated users</div>
+          <div class="hero-figure">+50.5</div>
+          <p class="hero-unit">incremental purchasers minus incremental unsubscribes</p>
+
+          <p class="decomposition">
+            <span class="pos">+212.8</span> incremental purchasers
+            &minus; <span class="neg">162.3</span> incremental unsubscribes
+            &rarr; <strong>net +50.5</strong>, a positivity / negativity ratio of
+            <strong>1.311</strong>.
+          </p>
+
+          <p class="confidence">
+            The net effect is a point estimate. The experiment&rsquo;s 95% confidence
+            band belongs to the GCG uplift: <b>+0.9968 per user by day 27</b>,
+            95% CI <b>[+0.9433, +1.0502]</b>, which excludes 0.
+          </p>
+
+          <div class="decision">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M8 4.5v4.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <circle cx="8" cy="11.4" r=".9" fill="currentColor"/>
+            </svg>
+            Decision: Investigate — a winning primary with a failed guardrail is not a Ship.
+          </div>
+        </div>
+
+        <div class="guardrail-panel">
+          <div class="guardrail-head">
+            <h3>Guardrail status</h3>
+            <span class="guardrail-count">1 of 2 breached</span>
+          </div>
+
+          <div class="g-row">
+            <span class="g-icon fail" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M5.4 5.4l5.2 5.2M10.6 5.4l-5.2 5.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <div>
+              <div class="g-name">Unsubscribe rate</div>
+              <div class="g-detail">control 0.0537 &rarr; treated 0.2160 · delta +0.1623</div>
+              <div class="g-detail"><span class="g-state fail">Breached</span> · threshold 0.0000 · p &lt; 1e-300 (Holm-adjusted)</div>
+            </div>
+          </div>
+
+          <div class="g-row">
+            <span class="g-icon pass" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M4.8 8.2l2.1 2.1 4.3-4.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <div>
+              <div class="g-name">Notifications per user per day</div>
+              <div class="g-detail">control 0.0000 &rarr; treated 3.0000 · delta 3.0000</div>
+              <div class="g-detail"><span class="g-state pass">Holds</span> · daily cap 3 · 0 user-days over cap</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== DESIGN ===================== -->
+    <section aria-labelledby="design-heading">
+      <div class="section-head">
+        <span class="section-kicker">01</span>
+        <h2 id="design-heading">Design</h2>
+        <p class="section-lede">
+          CRM randomizes once, at segment-formation time, because the same user is targeted
+          by many campaigns. The send balancer enforces the daily cap; the SRM check confirms
+          the split behaves as planned.
+        </p>
+      </div>
+
+      <div class="grid g3">
+        <div class="tile accent-blue">
+          <div class="t-label">Randomization unit</div>
+          <div class="mini-value">User, once</div>
+          <div class="mini-note">
+            Group is fixed per user at segment-formation time. 50% test / 50% control,
+            plus a 10% global control group outside this readout.
+          </div>
+          <div class="mini-note"><strong>8,881</strong> test · <strong>9,030</strong> control.</div>
+        </div>
+
+        <div class="tile accent-blue">
+          <div class="t-label">Send balancer</div>
+          <div class="mini-value">Cap 3 / user / day</div>
+          <div class="mini-note">
+            4 campaigns offered per user per day; at most 3 sends, spread across prime hours.
+          </div>
+          <div class="mini-note"><strong>0</strong> cap violations — no user-day exceeded the cap.</div>
+        </div>
+
+        <div class="tile accent-good">
+          <div class="t-label">SRM check</div>
+          <div class="mini-value">p = 0.266</div>
+          <div class="mini-note">
+            Segment-stage test share <strong>0.4958</strong> matches the planned split.
+            Checked against the planned 50% split, not 50/50.
+          </div>
+          <div class="mini-note">χ² = 1.2395 · exact p = 0.2656.</div>
+        </div>
+      </div>
+
+      <div class="split">
+        <div>
+          <table class="stack">
+            <thead>
+              <tr>
+                <th scope="col">Stage</th>
+                <th scope="col" class="num">Test share</th>
+                <th scope="col" class="num">SRM p</th>
+                <th scope="col">Reading</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="metric" data-label="Stage">Segment (CRM-correct)</td>
+                <td class="num" data-label="Test share">0.4958</td>
+                <td class="num" data-label="SRM p">0.266</td>
+                <td data-label="Reading">Balanced</td>
+              </tr>
+              <tr>
+                <td class="metric" data-label="Stage">Exposure (product-style)</td>
+                <td class="num" data-label="Test share">0.5629</td>
+                <td class="num" data-label="SRM p">&asymp; 0</td>
+                <td data-label="Reading">Fires</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="table-note">
+            Exposure-stage bucketing drops the part of the control arm that arrives later,
+            so the entering population no longer matches the assigned one.
+          </p>
+
+          <hr class="divider">
+
+          <div class="grid g2">
+            <div>
+              <div class="t-label">Primary metric</div>
+              <div class="mini-note" style="margin-top:4px">
+                Per-user purchase rate — P(any purchase over the 28-day horizon)
+              </div>
+            </div>
+            <div>
+              <div class="t-label">Power</div>
+              <div class="mini-note" style="margin-top:4px">
+                MDE 0.06765 absolute (10% relative on a 0.6765 baseline) · 751 per group ·
+                alpha 0.05 · power 80%
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <figure>
+          <img src="../../plots/pipeline_srm.png" width="1981" height="1171"
+               alt="Sample-ratio-mismatch chart: segment-stage bucketing stays at the planned test share, while exposure-stage bucketing inflates it.">
+          <figcaption>Segment-stage stays at the planned test share; exposure-stage inflates it.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===================== RESULTS ===================== -->
+    <section aria-labelledby="results-heading">
+      <div class="section-head">
+        <span class="section-kicker">02</span>
+        <h2 id="results-heading">Results</h2>
+        <p class="section-lede">
+          The primary metric moves, the global control group confirms the cumulative uplift,
+          and the churn cost is priced into the net.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="t-label" style="margin-bottom:10px">Primary A/B metric — per-user purchase rate</div>
+        <div class="grid g4">
+          <div class="tile accent-blue">
+            <div class="t-label">Control</div>
+            <div class="t-value">67.6523%</div>
+            <div class="t-note">95% CI of the rate ±0.9649% · n = 9,030</div>
+          </div>
+          <div class="tile accent-blue">
+            <div class="t-label">Treatment</div>
+            <div class="t-value">88.9314%</div>
+            <div class="t-note">95% CI of the rate ±0.6525% · n = 8,881</div>
+          </div>
+          <div class="tile accent-blue">
+            <div class="t-label">Relative lift</div>
+            <div class="t-value">+31.45%</div>
+            <div class="t-note">Absolute difference +0.21279 (+21.279 pp)</div>
+          </div>
+          <div class="tile accent-ink">
+            <div class="t-label">Significance</div>
+            <div class="t-value">p &lt; 1e-300</div>
+            <div class="t-note">95% CI of the difference [+0.20114, +0.22444]</div>
+          </div>
+        </div>
+        <p class="mini-note" style="margin-top:14px">
+          The revenue OEC agrees: mean revenue per user rises from 608.3699 to 1180.5793,
+          a difference of +572.2094 (Welch t = 40.419).
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="split wide-right" style="margin-top:0">
+          <div>
+            <div class="t-label">Global control group</div>
+            <div class="t-value" style="font-size:clamp(2rem,5vw,2.7rem)">+0.9968</div>
+            <div class="t-note" style="font-size:0.9rem">
+              cumulative purchases per user by day 27, marketed minus global control
+            </div>
+            <p class="confidence" style="margin-top:14px">
+              95% CI <b>[+0.9433, +1.0502]</b>. The band excludes 0, so the cumulative
+              uplift is distinguishable from no effect on this run.
+            </p>
+            <p class="mini-note" style="margin-top:10px">
+              Last three simulated days: day 25 +0.9215 [+0.8702, +0.9728] ·
+              day 26 +0.9587 [+0.9063, +1.0110] · day 27 +0.9968 [+0.9433, +1.0502].
+            </p>
+          </div>
+          <figure>
+            <img src="../../plots/pipeline_gcg_uplift.png" width="1991" height="1234"
+                 alt="Line chart of cumulative uplift from the global control group rising to about 1.0 purchase per user by day 27, with a 95% confidence band.">
+            <figcaption>Cumulative marketed-minus-GCG uplift with a 95% band.</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="t-label" style="margin-bottom:10px">Variance reduction — GCG refresh stability</div>
+        <div class="grid g2">
+          <div class="tile accent-red">
+            <div class="t-label">Full reshuffle</div>
+            <div class="t-value">0.3280</div>
+            <div class="t-note">CV of the uplift trend — control baseline jumps</div>
+          </div>
+          <div class="tile accent-good">
+            <div class="t-label">Partial rotation (config share)</div>
+            <div class="t-value">0.0090</div>
+            <div class="t-note">CV of the uplift trend — stable, lower variation</div>
+          </div>
+        </div>
+        <p class="mini-note" style="margin-top:16px; font-size:0.9rem">
+          <strong style="color:var(--ink)">Why it matters.</strong>
+          A full reshuffle replaces the control baseline, so the uplift trend jumps for
+          reasons unrelated to campaign performance. A partial rotation keeps the baseline
+          stable — CV 0.3280 versus 0.0090 — which is what makes the day-27 uplift readable.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="t-label" style="margin-bottom:10px">Net effect per 1,000 treated users</div>
+        <div class="grid g4">
+          <div class="tile accent-blue">
+            <div class="t-label">Incremental purchasers</div>
+            <div class="t-value">+212.8</div>
+            <div class="t-note">uplift side</div>
+          </div>
+          <div class="tile accent-red">
+            <div class="t-label">Incremental unsubscribes</div>
+            <div class="t-value">&minus;162.3</div>
+            <div class="t-note">penalty side</div>
+          </div>
+          <div class="tile accent-ink">
+            <div class="t-label">Net effect</div>
+            <div class="t-value">+50.5</div>
+            <div class="t-note">positive once churn is priced in</div>
+          </div>
+          <div class="tile accent-blue">
+            <div class="t-label">Positivity / negativity</div>
+            <div class="t-value">1.311</div>
+            <div class="t-note">a thin but positive margin</div>
+          </div>
+        </div>
+
+        <div class="split" style="margin-top:20px">
+          <div>
+            <p class="mini-note" style="font-size:0.9rem; margin-top:0">
+              A campaign pays off only when the incremental purchasers it drives outnumber
+              the incremental unsubscribes it causes. Both sides are priced per 1,000 treated
+              users, so the sign of the net is directly readable. Churn priced at one month of
+              ARPU per unsubscribe: control 485 unsubscribes / 242500.0000 lost revenue;
+              GCG 129 / 64500.0000; test 1918 / 959000.0000.
+            </p>
+            <p class="mini-note" style="font-size:0.9rem">
+              Per-campaign balance is uniform in this run: campaigns 1, 3, 5, 7, 9 and 11 each
+              score positivity 203.4716, negativity 137.3521 and net 66.1194 — all positive.
+            </p>
+          </div>
+          <figure>
+            <img src="../../plots/pipeline_net_effect.png" width="1937" height="1235"
+                 alt="Bar chart of incremental purchasers, the unsubscribe penalty and the resulting positive net effect per 1,000 treated users.">
+            <figcaption>Incremental purchasers, unsubscribe penalty and the net.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== GUARDRAILS ===================== -->
+    <section aria-labelledby="guardrails-heading">
+      <div class="section-head">
+        <span class="section-kicker">03</span>
+        <h2 id="guardrails-heading">Guardrails</h2>
+        <p class="section-lede">
+          A single headline metric is never optimized alone. Guardrails can block a launch
+          on their own; here the unsubscribe guardrail does.
+        </p>
+      </div>
+
+      <div class="card">
+        <table class="stack">
+          <thead>
+            <tr>
+              <th scope="col">Metric</th>
+              <th scope="col" class="num">Control</th>
+              <th scope="col" class="num">Treated</th>
+              <th scope="col" class="num">Delta</th>
+              <th scope="col" class="num">Threshold</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="metric" data-label="Metric">unsubscribe_rate</td>
+              <td class="num" data-label="Control">0.0537</td>
+              <td class="num" data-label="Treated">0.2160</td>
+              <td class="num" data-label="Delta">+0.1623</td>
+              <td class="num" data-label="Threshold">0.0000</td>
+              <td data-label="Status">
+                <span class="flag fail">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  Breached
+                </span>
+                <span class="sub">+302.1% · p &lt; 1e-300 (Holm-adjusted)</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="metric" data-label="Metric">notifications_per_user_per_day</td>
+              <td class="num" data-label="Control">0.0000</td>
+              <td class="num" data-label="Treated">3.0000</td>
+              <td class="num" data-label="Delta">3.0000</td>
+              <td class="num" data-label="Threshold">3.0000</td>
+              <td data-label="Status">
+                <span class="flag pass">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Holds
+                </span>
+                <span class="sub">hard cap · 0 violations</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-note">
+          Family of 2 guardrails, Holm-corrected. A threshold of 0.0000 means the
+          unsubscribe rate may not rise at all.
+        </p>
+
+        <div class="hierarchy" aria-label="Metric hierarchy">
+          <div class="tier">
+            <div class="tier-name">OEC</div>
+            <div class="tier-metrics">revenue</div>
+          </div>
+          <div class="tier">
+            <div class="tier-name">Driver</div>
+            <div class="tier-metrics">retention_d7<br>orders_per_user<br>aov</div>
+          </div>
+          <div class="tier">
+            <div class="tier-name">Proxy</div>
+            <div class="tier-metrics">session_rate</div>
+          </div>
+          <div class="tier">
+            <div class="tier-name">Debug</div>
+            <div class="tier-metrics">send_hour_match<br>exposure_rate</div>
+          </div>
+          <div class="tier guardrail-tier">
+            <div class="tier-name">Guardrail</div>
+            <div class="tier-metrics">unsubscribe_rate<br>notifications_per_user_per_day</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CAVEATS ===================== -->
+    <section aria-labelledby="caveats-heading">
+      <div class="section-head">
+        <span class="section-kicker">04</span>
+        <h2 id="caveats-heading">Caveats</h2>
+      </div>
+
+      <div class="callout">
+        <span class="callout-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3.5L21 20H3L12 3.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M12 9v4.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <circle cx="12" cy="16.7" r="1" fill="currentColor"/>
+          </svg>
+        </span>
+        <h3>Not reproducible from the shipped sample CSV</h3>
+        <p>
+          <code>data/experiment_sample.csv</code> is a 300-row outcomes-schema example with
+          no <code>group</code> column. The uplift and net figures cannot be recomputed from
+          it. They come from the simulator: run
+          <code>scripts/run_full_pipeline.py</code> with 20,000 users, 28 days, 12 campaigns
+          and seed 42 to regenerate them.
+        </p>
+      </div>
+
+      <ul class="caveat-list">
+        <li>
+          <strong>Every number comes from a synthetic simulator.</strong>
+          It is a known data-generating process: no inter-user interference, no bots,
+          no delayed conversions, no logging loss, and the planted lift is constant in time.
+          The lab is a single-experiment playground, not an experimentation platform.
+        </li>
+        <li>
+          <strong>One seed.</strong> The GCG and exposure-window comparisons are estimators
+          exercised on one run, not a power study. The primary A/B test is powered at 80%
+          for an MDE of 0.06765 with 751 users per group.
+        </li>
+        <li>
+          <strong>The net effect is a point estimate.</strong> The 95% confidence band on
+          this page belongs to the GCG cumulative uplift; the net-of-churn figure is a
+          deterministic construction from the uplift and unsubscribe counts.
+        </li>
+        <li>
+          <strong>The exposure window is not a free variance cut.</strong> Dropping rows
+          always raises a proportion&rsquo;s standard error, so on the default persistent-effect
+          simulator the windowed SE (0.00124) is larger than the all-days SE (0.00066);
+          its value shows up on a transient-effect DGP.
+        </li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer>
+    <p class="sources-title">Sources</p>
+    <ul class="sources">
+      <li><code>outputs/report.md</code> — pipeline results: SRM, GCG, refresh CV, net effect, exposure window, guardrails, metric hierarchy.</li>
+      <li><code>outputs/ab_test_report.md</code> — status, design, MDE, primary metric, Holm-corrected guardrails, decision.</li>
+      <li><code>README.md</code> — project scope and the sample-CSV limitation.</li>
+      <li><code>CONTRACT.md</code> — the five-table frozen data model.</li>
+      <li><code>plots/pipeline_srm.png</code>, <code>plots/pipeline_gcg_uplift.png</code>, <code>plots/pipeline_net_effect.png</code> — the three git-tracked figures.</li>
+    </ul>
+    <p class="provenance">
+      Number provenance: outputs/report.md:3-14, 20-51, 94-105, 123-125 ·
+      outputs/ab_test_report.md:6, 22-30, 43, 50-57, 90-93, 122-124 ·
+      README.md:3, 46-62, 121-136 · CONTRACT.md:15-23.
+    </p>
+    <p class="footer-meta">Readout generated 2026-10-25 · CRM Experiment Lab · Default synthetic run, seed 42.</p>
+  </footer>
+
+</div>
+</body>
+</html>
