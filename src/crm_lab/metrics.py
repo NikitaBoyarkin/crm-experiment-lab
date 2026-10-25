@@ -123,7 +123,7 @@ def _user_group_map(assignments: pd.DataFrame) -> pd.Series:
 
 def _group_slices(sim: SimData) -> dict[str, pd.Index]:
     groups = _user_group_map(sim.assignments)
-    return dict(groups.groupby(groups).groups)
+    return {str(key): idx for key, idx in groups.groupby(groups).groups.items()}
 
 
 def _unsubscribe_rate(sim: SimData, users: pd.Index) -> float:

@@ -24,5 +24,11 @@ jobs:
       - name: Lint
         run: uv run ruff check src/ scripts/ tests/
 
+      - name: Format check
+        run: uv run ruff format --check src/ scripts/ tests/
+
+      - name: Type check
+        run: uv run mypy
+
       - name: Test
         run: uv run pytest

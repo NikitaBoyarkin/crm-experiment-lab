@@ -7,6 +7,7 @@ CIs, MDE). The test suite calibrates each of them under a known null.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 
 import numpy as np
@@ -114,7 +115,7 @@ def cluster_robust_se(df: pd.DataFrame, value_col: str, cluster_col: str, treat_
 
 def bootstrap_ci(
     values: np.ndarray,
-    stat: str | callable = "mean",
+    stat: str | Callable[[np.ndarray], float] = "mean",
     n_boot: int = 2000,
     alpha: float = 0.05,
     seed: int = 0,
@@ -125,6 +126,7 @@ def bootstrap_ci(
     n = len(values)
     if n == 0:
         return (np.nan, np.nan)
+    fn: Callable[..., float]
     if callable(stat):
         fn = stat
     elif stat == "mean":

@@ -217,12 +217,12 @@ def _make_outcomes(
         campaign_effects, on="campaign_id", how="left"
     )
     lift = (
-        exposed_sends.groupby(["user_id", "day"], as_index=False)["true_lift_pp"]
+        exposed_sends.groupby(["user_id", "day"], as_index=False)[["true_lift_pp"]]
         .sum()
         .rename(columns={"true_lift_pp": "lift"})
     )
     unsub = (
-        exposed_sends.groupby(["user_id", "day"], as_index=False)["true_unsub_pp"]
+        exposed_sends.groupby(["user_id", "day"], as_index=False)[["true_unsub_pp"]]
         .sum()
         .rename(columns={"true_unsub_pp": "unsub"})
     )
