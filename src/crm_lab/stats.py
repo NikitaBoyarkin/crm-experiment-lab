@@ -99,14 +99,14 @@ def cluster_robust_se(df: pd.DataFrame, value_col: str, cluster_col: str, treat_
     xtx_inv = np.linalg.pinv(design.T @ design)
     beta = xtx_inv @ design.T @ y
     resid = y - design @ beta
-    clusters = work[cluster_col].to_numpy()
-    unique = np.unique(clusters)
-    meat = np.zeros((2, 2))
-    for c in unique:
-        mask = clusters == c
-        u = (design[mask] * resid[mask, None]).sum(axis=0)
-        meat += np.outer(u, u)
+    codes, unique = pd.factorize(work[cluster_col].to_numpy(), sort=True)
     g = len(unique)
+    # Grouped sums via ``bincount`` keep this O(n_rows); a per-cluster loop over
+    # 20k users x 28 days (560k rows) does not finish in usable time.
+    scaled = design * resid[:, None]
+    u0 = np.bincount(codes, weights=scaled[:, 0], minlength=g)
+    u1 = np.bincount(codes, weights=scaled[:, 1], minlength=g)
+    meat = np.array([[u0 @ u0, u0 @ u1], [u1 @ u0, u1 @ u1]])
     n, k = design.shape
     correction = g / (g - 1) * (n - 1) / (n - k)
     cov = xtx_inv @ (meat * correction) @ xtx_inv

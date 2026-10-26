@@ -477,17 +477,31 @@ def build() -> str:
             f"{fmt_p(float(r['unsub_p']))} | {r['net_per_1k']:+.1f} | {r['verdict_strict']} | "
             f"{r['verdict_tolerance']} |"
         )
+    by_cap = ship.set_index(ship["daily_cap"].astype(int))
+    shipped_caps = sorted(
+        int(c) for c in by_cap.index if by_cap.loc[c, "verdict_tolerance"] == "Ship"
+    )
+    blocked_caps = sorted(
+        int(c) for c in by_cap.index if by_cap.loc[c, "verdict_tolerance"] != "Ship"
+    )
+    best_cap = int(by_cap["net_per_1k"].idxmax())
+    best_net = float(by_cap.loc[best_cap, "net_per_1k"])
+    blocked_cap = blocked_caps[0] if blocked_caps else best_cap
+    blocked_delta = float(by_cap.loc[blocked_cap, "unsub_delta"])
+    best_delta = float(by_cap.loc[best_cap, "unsub_delta"])
+    shipped_text = " and ".join(f"cap {c}" for c in shipped_caps)
     lines += [
         "",
         "> Because the treated arm is **sent to** and the control arm is not, the "
         "unsubscribe delta is positive and significant at every cap — the strict guardrail "
         "(`delta > 0` blocks) can never be satisfied, at any volume, so a ship verdict is "
-        "reachable **only** with an explicit churn budget. Under a 12% budget: caps 1 and 2 "
-        "ship, cap 3 (needs 16.3%) does not — and **cap 2 maximises the net effect "
-        "(+56.8 / 1k)**, cutting churn from 16.2% to 11.6% at a smaller lift cost than "
-        "cap 1. The actionable read: set the churn budget from the ARPU value of a lost "
-        "user, then **ship at the cap that maximises net within it** — not chase a strict "
-        "zero that no sending campaign can meet.",
+        f"reachable **only** with an explicit churn budget. Under a {SHIP_TOLERANCE:.0%} "
+        f"budget: {shipped_text} ship, cap {blocked_cap} (needs {blocked_delta:.1%}) does "
+        f"not — and **cap {best_cap} maximises the net effect ({best_net:+.1f} / 1k)**, "
+        f"cutting churn from {blocked_delta:.1%} to {best_delta:.1%} at a smaller lift cost "
+        "than a tighter cap. The actionable read: set the churn budget from the ARPU value "
+        "of a lost user, then **ship at the cap that maximises net within it** — not chase "
+        "a strict zero that no sending campaign can meet.",
         "",
         "---",
         "",

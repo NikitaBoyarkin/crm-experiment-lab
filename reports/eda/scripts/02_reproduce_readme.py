@@ -77,7 +77,7 @@ def main() -> None:
             "Window sensitivity all-days (effect/SE)", 7.6, float(sens["any_sensitivity"]), 0.05
         ),
         _label(
-            "Window sensitivity windowed (effect/SE)", 12.3, float(sens["true_sensitivity"]), 0.05
+            "Window sensitivity windowed (effect/SE)", 12.42, float(sens["true_sensitivity"]), 0.05
         ),
         _label("Unsubscribe guardrail delta", 0.1623, unsub_delta, 5e-5),
     ]

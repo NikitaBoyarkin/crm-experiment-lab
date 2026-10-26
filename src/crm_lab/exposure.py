@@ -15,6 +15,11 @@ What this does and does not buy (the honest version, demonstrated in
 - **It does *not* shrink the standard error by itself.** Fewer rows always make a
   proportion's SE larger; the win is in the signal-to-noise ratio
   ``effect / SE`` (the z-statistic), not in the SE in isolation.
+- **The SE is clustered at the randomization unit.** Rows are user-days while
+  users are the unit that was randomized, so the reported SE is a Liang-Zeger
+  sandwich on ``user_id``. On the default simulator each user-day outcome is drawn
+  independently, so it numerically coincides with the naive binomial SE; it only
+  diverges once outcomes correlate within a user.
 - **It must be applied symmetrically** to both arms. Windowing only the treated
   arm while the control keeps its full timeline biases the comparison.
 """
@@ -76,19 +81,22 @@ def apply_window(outcomes: pd.DataFrame, exposures: pd.DataFrame, window_days: i
 def _effect_and_se(
     outcomes: pd.DataFrame, groups: pd.Series, metric: str = "purchased"
 ) -> tuple[float, float]:
-    """Test-vs-control difference in ``metric`` rate and its standard error."""
+    """Test-vs-control difference in ``metric`` rate and its standard error.
+
+    Rows are user-days while randomization happens at the user, so a plain
+    two-proportion z-test counts correlated days as independent trials and
+    under-states the SE. The SE is therefore cluster-robust at ``user_id``
+    (Liang-Zeger sandwich), which is the unit the metric is declared on.
+    """
     joined = outcomes.join(groups, on="user_id", how="inner")
-    tested = joined.loc[joined["group"] == "test"]
-    control = joined.loc[joined["group"] == "control"]
-    n_test = int(len(tested))
-    n_control = int(len(control))
-    if n_test == 0 or n_control == 0:
+    work = joined.loc[joined["group"].isin(["test", "control"])].copy()
+    work["is_test"] = (work["group"] == "test").astype(int)
+    tested = work.loc[work["is_test"] == 1, metric]
+    control = work.loc[work["is_test"] == 0, metric]
+    if tested.empty or control.empty:
         return 0.0, 0.0
-    successes_test = int(tested[metric].sum())
-    successes_control = int(control[metric].sum())
-    # Pass control as arm "a" so the reported diff is test - control (B - A).
-    result = stats.two_proportion_ztest(successes_control, n_control, successes_test, n_test)
-    return float(result.diff), float(result.se)
+    effect = float(tested.mean()) - float(control.mean())
+    return effect, stats.cluster_robust_se(work, metric, "user_id", "is_test")
 
 
 def compare_any_vs_true(sim: SimData) -> ExposureComparison:

@@ -73,7 +73,7 @@ def apply_window(outcomes: pd.DataFrame, exposures: pd.DataFrame, window_days: i
 def compare_any_vs_true(sim: SimData) -> ExposureComparison: ...
 ```
 - `apply_window`: keep only outcome rows within `window_days` of a user's first exposure day (`Is Exposed = True`).
-- `compare_any_vs_true`: effect + SE under windowed vs all-days metric; windowed should have lower noise (smaller SE relative to effect). Fill `ExposureComparison`.
+- `compare_any_vs_true`: effect + cluster-robust SE under windowed vs all-days metric. Rows are user-days but randomization is at the user, so the SE is a Liang-Zeger sandwich clustered on `user_id`. Dropping rows *raises* the SE: windowed SE ≥ all-days SE. The window's payoff is a higher `effect / SE` on a transient-effect DGP, never a smaller SE. Fill `ExposureComparison`.
 
 ### `src/crm_lab/positivity.py`
 ```python
@@ -112,5 +112,5 @@ One function per module chart → `plots/`. Uses `crm_lab.plotting`.
 ## Tests
 `tests/` calibrates against the DGP: SRM detector fires on a corrupted split,
 balancer never exceeds the cap, GCG uplift CI covers the planted effect,
-windowed SE ≤ all-days SE, net effect sign matches the planted lift, MDE/N
+windowed SE ≥ all-days SE, net effect sign matches the planted lift, MDE/N
 closed forms match `statsmodels`. Every test must run on synthetic data only.

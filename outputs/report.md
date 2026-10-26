@@ -10,7 +10,7 @@ Synthetic CRM experiment: **20,000 users**, **28 days**, **12 campaigns** (4 off
 | GCG cumulative uplift | +0.9968 / user by day 27 [+0.9433, +1.0502] | marketed minus global control, purchases per user; CI excludes 0 |
 | GCG refresh stability | CV full=0.3280 vs partial=0.0090 | partial rotation keeps the control baseline stable |
 | Net effect / 1k treated | +50.5 (uplift +212.8 minus unsub 162.3) | positive net once unsubscribes are priced in |
-| Exposure window | SE any=0.00066 vs windowed=0.00124 | on the default DGP the window anchors the horizon, not the SE; on a transient effect it lifts sensitivity 7.6 -> 12.3 (effect/SE) |
+| Exposure window | SE any=0.00066 vs windowed=0.00124 | on the default DGP the window anchors the horizon, not the SE; on a transient effect it lifts sensitivity 7.6 -> 12.4 (effect/SE) |
 | Guardrails | 1 of 2 breached | unsubscribe guardrail breaches, the daily send cap holds |
 
 ## 1. Randomization: segment-stage vs exposure-stage
@@ -75,15 +75,15 @@ A CRM send influences a user for a bounded horizon. The `Is Exposed = True` metr
 
 | Metric | Effect | Std error | Var signal | Effect / SE |
 |---|---|---|---|---|
-| all days (Is Exposed = Any) | 0.03621 | 0.00066 | 0.000000432537 | 55.05 |
-| windowed (Is Exposed = True) | 0.03598 | 0.00124 | 0.000001529049 | 29.10 |
+| all days (Is Exposed = Any) | 0.03621 | 0.00066 | 0.000000434150 | 54.95 |
+| windowed (Is Exposed = True) | 0.03598 | 0.00124 | 0.000001532074 | 29.07 |
 
 **When the window actually pays off** — a transient-effect DGP (`window_sensitivity_demo`), where the treated lift exists only inside the window. Windowing no longer just re-anchors the horizon: it stops the worn-off tail from diluting the effect, so both the effect and the signal-to-noise ratio rise.
 
 | Metric (transient DGP) | Effect | Std error | Effect / SE |
 |---|---|---|---|
-| all days (Is Exposed = Any) | 0.00920 | 0.00122 | 7.55 |
-| windowed (Is Exposed = True) | 0.03081 | 0.00251 | 12.28 |
+| all days (Is Exposed = Any) | 0.00920 | 0.00121 | 7.62 |
+| windowed (Is Exposed = True) | 0.03081 | 0.00248 | 12.42 |
 
 ## 5. Guardrails and metric hierarchy
 

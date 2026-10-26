@@ -113,7 +113,7 @@ The CRM lever is send volume: a lower daily cap means fewer notifications, so fe
 | 2 | +25.5% | +0.1155 | <1e-300 | +56.8 | Investigate | Ship |
 | 1 | +15.5% | +0.0620 | <1e-300 | +42.7 | Investigate | Ship |
 
-> Because the treated arm is **sent to** and the control arm is not, the unsubscribe delta is positive and significant at every cap — the strict guardrail (`delta > 0` blocks) can never be satisfied, at any volume, so a ship verdict is reachable **only** with an explicit churn budget. Under a 12% budget: caps 1 and 2 ship, cap 3 (needs 16.3%) does not — and **cap 2 maximises the net effect (+56.8 / 1k)**, cutting churn from 16.2% to 11.6% at a smaller lift cost than cap 1. The actionable read: set the churn budget from the ARPU value of a lost user, then **ship at the cap that maximises net within it** — not chase a strict zero that no sending campaign can meet.
+> Because the treated arm is **sent to** and the control arm is not, the unsubscribe delta is positive and significant at every cap — the strict guardrail (`delta > 0` blocks) can never be satisfied, at any volume, so a ship verdict is reachable **only** with an explicit churn budget. Under a 12% budget: cap 1 and cap 2 ship, cap 3 (needs 16.2%) does not — and **cap 2 maximises the net effect (+56.8 / 1k)**, cutting churn from 16.2% to 11.6% at a smaller lift cost than a tighter cap. The actionable read: set the churn budget from the ARPU value of a lost user, then **ship at the cap that maximises net within it** — not chase a strict zero that no sending campaign can meet.
 
 ---
 
